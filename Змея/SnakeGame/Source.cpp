@@ -4,57 +4,56 @@
 #include <chrono>
 #include <thread>
 #include <time.h>
-#include <fstream>
 #include <Windows.h>
 
-//#define DevInfo // Подключить для дисплея разработчика
+//#define DevInfo // РџРѕРґРєР»СЋС‡РёС‚СЊ РґР»СЏ РґРёСЃРїР»РµСЏ СЂР°Р·СЂР°Р±РѕС‚С‡РёРєР°
 
-// Размер поля и символы
+// Р Р°Р·РјРµСЂ РїРѕР»СЏ Рё СЃРёРјРІРѕР»С‹
 const int HEIGHT = 10, WIDTH = 10;
 const char fieldSymbol = '.';
 const char snakeHeadSymbol = '@';
 const char snakeSymbol = '#';
 const char appleSymbol = 'O';
 
-// Важные переменные
+// Р’Р°Р¶РЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ
 int snakeSize = 0;
 int applePosition[2];
 char snakeDirection = 'u';
 char snakeTailDirection = 'u';
 
-// Координаты сегментов змеи
+// РљРѕРѕСЂРґРёРЅР°С‚С‹ СЃРµРіРјРµРЅС‚РѕРІ Р·РјРµРё
 struct Segment {
 	int x;
 	int y;
 };
-// Прототип для корректной работы
+// РџСЂРѕС‚РѕС‚РёРї РґР»СЏ РєРѕСЂСЂРµРєС‚РЅРѕР№ СЂР°Р±РѕС‚С‹
 bool snakeCreate(char field[HEIGHT][WIDTH], Segment snake, Segment snakeArr[]); 
 
-// Инициализация поля 
+// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРѕР»СЏ 
 void fieldInitialize(char field[HEIGHT][WIDTH]) {
 
-	for (int i = 0; i < HEIGHT; i++) { // Заполнение в столбец (y)
-		for (int j = 0; j < WIDTH; j++) { // Заполнение в строку (x)
+	for (int i = 0; i < HEIGHT; i++) { // Р—Р°РїРѕР»РЅРµРЅРёРµ РІ СЃС‚РѕР»Р±РµС† (y)
+		for (int j = 0; j < WIDTH; j++) { // Р—Р°РїРѕР»РЅРµРЅРёРµ РІ СЃС‚СЂРѕРєСѓ (x)
 			field[i][j] = fieldSymbol;
 		}
 	}
 }
 
-// Инициализация змейки
+// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р·РјРµР№РєРё
 void initializeSnake(char field[HEIGHT][WIDTH], Segment snake[]) {
 
-	// Начальная позиция змейки
+	// РќР°С‡Р°Р»СЊРЅР°СЏ РїРѕР·РёС†РёСЏ Р·РјРµР№РєРё
 	snake[0].x = WIDTH / 2;
 	snake[0].y = HEIGHT / 2;
 
-	// Создание символа змеи
+	// РЎРѕР·РґР°РЅРёРµ СЃРёРјРІРѕР»Р° Р·РјРµРё
 	field[snake[0].y][snake[0].x] = snakeSymbol;
 }
 
-// Отображение игрового поля 
+// РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РёРіСЂРѕРІРѕРіРѕ РїРѕР»СЏ 
 void fieldDisplay(char field[HEIGHT][WIDTH], Segment snake[]) {
 
-	// Инфо разработчика
+	// РРЅС„Рѕ СЂР°Р·СЂР°Р±РѕС‚С‡РёРєР°
 	#ifdef DevInfo
 		std::cout << "Snake size: " << snakeSize << std::endl;
 		std::cout << "Apple position: " << applePosition[1] << ' ' << applePosition[0] << std::endl;
@@ -63,15 +62,15 @@ void fieldDisplay(char field[HEIGHT][WIDTH], Segment snake[]) {
 		std::cout << "Snake last segment position: " << snake[snakeSize].x << ' ' << snake[snakeSize].y << std::endl;
 	#endif // DevInfo
 
-	// Счетчик очков
+	// РЎС‡РµС‚С‡РёРє РѕС‡РєРѕРІ
 	std::cout << "Score: " << snakeSize + 1 << std::endl;
 
-	field[applePosition[0]][applePosition[1]] = appleSymbol; // Отображение яблока
+	field[applePosition[0]][applePosition[1]] = appleSymbol; // РћС‚РѕР±СЂР°Р¶РµРЅРёРµ СЏР±Р»РѕРєР°
 
-	// Отображение игрового поля
-	for (int i = 0; i < HEIGHT; i++) { // Движение по ординате
+	// РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РёРіСЂРѕРІРѕРіРѕ РїРѕР»СЏ
+	for (int i = 0; i < HEIGHT; i++) { // Р”РІРёР¶РµРЅРёРµ РїРѕ РѕСЂРґРёРЅР°С‚Рµ
 
-		for (int j = 0; j < WIDTH; j++) { // Движение по абциссе
+		for (int j = 0; j < WIDTH; j++) { // Р”РІРёР¶РµРЅРёРµ РїРѕ Р°Р±С†РёСЃСЃРµ
 			std::cout << field[i][j];
 		}
 		std::cout << std::endl; 
@@ -79,7 +78,7 @@ void fieldDisplay(char field[HEIGHT][WIDTH], Segment snake[]) {
 	std::cout << std::endl;
 }
 
-// Определение направления хвоста змеи
+// РћРїСЂРµРґРµР»РµРЅРёРµ РЅР°РїСЂР°РІР»РµРЅРёСЏ С…РІРѕСЃС‚Р° Р·РјРµРё
 void setSnakeTailDirection(const Segment snake[], int tempLastY, int tempLastX) {
 
 	if (snake[snakeSize].y == tempLastY - 1) snakeTailDirection = 'u';
@@ -88,14 +87,14 @@ void setSnakeTailDirection(const Segment snake[], int tempLastY, int tempLastX) 
 	if (snake[snakeSize].x == tempLastX + 1) snakeTailDirection = 'r';
 }
 
-// Увеличения размера змейки
+// РЈРІРµР»РёС‡РµРЅРёСЏ СЂР°Р·РјРµСЂР° Р·РјРµР№РєРё
 bool snakeGrow(char field[HEIGHT][WIDTH], Segment snake[]) {
-	// Проверка на максимальный размер
+	// РџСЂРѕРІРµСЂРєР° РЅР° РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ
 	if (snakeSize < (HEIGHT * WIDTH) - 2) {
-		snakeSize++; // Увеличение размера
-		snake[snakeSize] = snake[snakeSize - 1]; // Создание нового сегмента змеи путем дублирования
+		snakeSize++; // РЈРІРµР»РёС‡РµРЅРёРµ СЂР°Р·РјРµСЂР°
+		snake[snakeSize] = snake[snakeSize - 1]; // РЎРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ СЃРµРіРјРµРЅС‚Р° Р·РјРµРё РїСѓС‚РµРј РґСѓР±Р»РёСЂРѕРІР°РЅРёСЏ
 
-		// Ориентир на направление хвоста если змея длиннее двух сегментов
+		// РћСЂРёРµРЅС‚РёСЂ РЅР° РЅР°РїСЂР°РІР»РµРЅРёРµ С…РІРѕСЃС‚Р° РµСЃР»Рё Р·РјРµСЏ РґР»РёРЅРЅРµРµ РґРІСѓС… СЃРµРіРјРµРЅС‚РѕРІ
 		if (snakeSize > 1) {
 			switch (snakeTailDirection) {
 			case 'u': snake[snakeSize].y++; break;
@@ -104,7 +103,7 @@ bool snakeGrow(char field[HEIGHT][WIDTH], Segment snake[]) {
 			case 'r': snake[snakeSize].x--; break;
 			}
 		}
-		// Ориентир на направление головы для короткой змеи
+		// РћСЂРёРµРЅС‚РёСЂ РЅР° РЅР°РїСЂР°РІР»РµРЅРёРµ РіРѕР»РѕРІС‹ РґР»СЏ РєРѕСЂРѕС‚РєРѕР№ Р·РјРµРё
 		else {
 			switch (snakeDirection) {
 			case 'u': snake[snakeSize].y++; break;
@@ -113,53 +112,53 @@ bool snakeGrow(char field[HEIGHT][WIDTH], Segment snake[]) {
 			case 'r': snake[snakeSize].x--; break;
 			}
 		}
-		snakeCreate(field, snake[snakeSize], snake); // Отображение змеи на поле
+		snakeCreate(field, snake[snakeSize], snake); // РћС‚РѕР±СЂР°Р¶РµРЅРёРµ Р·РјРµРё РЅР° РїРѕР»Рµ
 
 		return true;
 	}
 	else return false;
 }
 
-// Генерация яблок
+// Р“РµРЅРµСЂР°С†РёСЏ СЏР±Р»РѕРє
 void appleGeneration(char field[HEIGHT][WIDTH], const Segment snake[]) {
 
-	// Генерация яблока в рандомной точке
+	// Р“РµРЅРµСЂР°С†РёСЏ СЏР±Р»РѕРєР° РІ СЂР°РЅРґРѕРјРЅРѕР№ С‚РѕС‡РєРµ
 	for (int i = 0; i < 15; i ++) {
-		bool segmentExist = false; // Проверка на наличие змеи в точке генерации яблока
+		bool segmentExist = false; // РџСЂРѕРІРµСЂРєР° РЅР° РЅР°Р»РёС‡РёРµ Р·РјРµРё РІ С‚РѕС‡РєРµ РіРµРЅРµСЂР°С†РёРё СЏР±Р»РѕРєР°
 
-		// Генерация яблока по X и Y
+		// Р“РµРЅРµСЂР°С†РёСЏ СЏР±Р»РѕРєР° РїРѕ X Рё Y
 		int appleTempPositionX = rand() % (WIDTH - 1);
 		int appleTempPositionY = rand() & (HEIGHT - 1);
 
 		for (int i = 0; i < snakeSize; i++) {
-			// Повторная генерация, если любой сегмент змеи находится в точке генерации яблока 
+			// РџРѕРІС‚РѕСЂРЅР°СЏ РіРµРЅРµСЂР°С†РёСЏ, РµСЃР»Рё Р»СЋР±РѕР№ СЃРµРіРјРµРЅС‚ Р·РјРµРё РЅР°С…РѕРґРёС‚СЃСЏ РІ С‚РѕС‡РєРµ РіРµРЅРµСЂР°С†РёРё СЏР±Р»РѕРєР° 
 			if (snake[i].y == appleTempPositionY && snake[i].x == appleTempPositionX) {
 				segmentExist = true;
 				break;
 			}
 		}
 
-		// Проверка на существование змеи в координатах яблока
+		// РџСЂРѕРІРµСЂРєР° РЅР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёРµ Р·РјРµРё РІ РєРѕРѕСЂРґРёРЅР°С‚Р°С… СЏР±Р»РѕРєР°
 		if (!segmentExist) {
 			applePosition[0] = appleTempPositionY;
 			applePosition[1] = appleTempPositionX;
 			break;
 		}
 
-		// Ручная генерация яблока в крайнем случае 
+		// Р СѓС‡РЅР°СЏ РіРµРЅРµСЂР°С†РёСЏ СЏР±Р»РѕРєР° РІ РєСЂР°Р№РЅРµРј СЃР»СѓС‡Р°Рµ 
 		if (i == 14) {
 
-			// Перебор поля в поисках пустого значения
+			// РџРµСЂРµР±РѕСЂ РїРѕР»СЏ РІ РїРѕРёСЃРєР°С… РїСѓСЃС‚РѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 			for (int j = 0; j < HEIGHT; j++) { 
 				for (int k = 0; k < WIDTH; k++) {
-					// Проверка на наличие змеи в точке массива
+					// РџСЂРѕРІРµСЂРєР° РЅР° РЅР°Р»РёС‡РёРµ Р·РјРµРё РІ С‚РѕС‡РєРµ РјР°СЃСЃРёРІР°
 					if (field[j][k] != snakeSymbol) {
 						field[j][k] = appleSymbol;
-						// Создание яблока
+						// РЎРѕР·РґР°РЅРёРµ СЏР±Р»РѕРєР°
 						applePosition[0] = j;
 						applePosition[1] = k;
 					
-						j = HEIGHT; // Выход их циклов
+						j = HEIGHT; // Р’С‹С…РѕРґ РёС… С†РёРєР»РѕРІ
 						break;
 					}
 				}
@@ -168,181 +167,181 @@ void appleGeneration(char field[HEIGHT][WIDTH], const Segment snake[]) {
 	}
 }
 
-// Создание символа змеи, взаимодействие с яблоками
+// РЎРѕР·РґР°РЅРёРµ СЃРёРјРІРѕР»Р° Р·РјРµРё, РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёРµ СЃ СЏР±Р»РѕРєР°РјРё
 bool snakeCreate(char field[HEIGHT][WIDTH], Segment snake, Segment snakeArr[]) {
 
-	field[snake.y][snake.x] = snakeSymbol; // Создание символа змеи
+	field[snake.y][snake.x] = snakeSymbol; // РЎРѕР·РґР°РЅРёРµ СЃРёРјРІРѕР»Р° Р·РјРµРё
 	
-	// Проверка на яблоко в точке создания змейки
+	// РџСЂРѕРІРµСЂРєР° РЅР° СЏР±Р»РѕРєРѕ РІ С‚РѕС‡РєРµ СЃРѕР·РґР°РЅРёСЏ Р·РјРµР№РєРё
 	if (snake.y == applePosition[0] && snake.x == applePosition[1]) {
 
 		applePosition[0] = -1;
 		applePosition[1] = -1;
-		if (!snakeGrow(field, snakeArr)) return false; // Увеличение змейки, проверка на максимальный размер
-		appleGeneration(field, snakeArr); // Генерация нового яблока
+		if (!snakeGrow(field, snakeArr)) return false; // РЈРІРµР»РёС‡РµРЅРёРµ Р·РјРµР№РєРё, РїСЂРѕРІРµСЂРєР° РЅР° РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ
+		appleGeneration(field, snakeArr); // Р“РµРЅРµСЂР°С†РёСЏ РЅРѕРІРѕРіРѕ СЏР±Р»РѕРєР°
 	}
 	return true;
 
 }
 
-// Удаление символа змеи
+// РЈРґР°Р»РµРЅРёРµ СЃРёРјРІРѕР»Р° Р·РјРµРё
 void snakeDelete(char field[HEIGHT][WIDTH], Segment snake) {
 	field[snake.y][snake.x] = fieldSymbol;
 }
 
-// Движение вверх
+// Р”РІРёР¶РµРЅРёРµ РІРІРµСЂС…
 bool moveUp(char field[HEIGHT][WIDTH], Segment snake[]) {
 
-	// Проверка выхода за поле
+	// РџСЂРѕРІРµСЂРєР° РІС‹С…РѕРґР° Р·Р° РїРѕР»Рµ
 	if (snake[0].y > 0) {
 
-		snakeDelete(field, snake[snakeSize]); // Удаление последнего сегмета
+		snakeDelete(field, snake[snakeSize]); // РЈРґР°Р»РµРЅРёРµ РїРѕСЃР»РµРґРЅРµРіРѕ СЃРµРіРјРµС‚Р°
 
-		if (field[snake[0].y - 1][snake[0].x] == snakeSymbol) return false; // Проверка на столкновение при движении вверх
+		if (field[snake[0].y - 1][snake[0].x] == snakeSymbol) return false; // РџСЂРѕРІРµСЂРєР° РЅР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёРµ РїСЂРё РґРІРёР¶РµРЅРёРё РІРІРµСЂС…
 
-		// Копирование новых координат головы
+		// РљРѕРїРёСЂРѕРІР°РЅРёРµ РЅРѕРІС‹С… РєРѕРѕСЂРґРёРЅР°С‚ РіРѕР»РѕРІС‹
 		int headX = snake[0].x;
 		int headY = snake[0].y - 1;
 
-		// Перетаскивание координат каждого сегмента на место предыдущего
+		// РџРµСЂРµС‚Р°СЃРєРёРІР°РЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚ РєР°Р¶РґРѕРіРѕ СЃРµРіРјРµРЅС‚Р° РЅР° РјРµСЃС‚Рѕ РїСЂРµРґС‹РґСѓС‰РµРіРѕ
 		for (int i = snakeSize; i > 0; i--) {
-			// Запоминание координат хвоста змеи
+			// Р—Р°РїРѕРјРёРЅР°РЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚ С…РІРѕСЃС‚Р° Р·РјРµРё
 			int tempLastY = snake[snakeSize].y;
 			int tempLastX = snake[snakeSize].x;
 			
 			snake[i] = snake[i - 1];
 			
-			// Cмена направления конца змеи
+			// CРјРµРЅР° РЅР°РїСЂР°РІР»РµРЅРёСЏ РєРѕРЅС†Р° Р·РјРµРё
 			if (i == snakeSize) {
 				setSnakeTailDirection(snake, tempLastY, tempLastX);
 			}
 		}
 
-		// Обновление позиции головы
+		// РћР±РЅРѕРІР»РµРЅРёРµ РїРѕР·РёС†РёРё РіРѕР»РѕРІС‹
 		snake[0].x = headX;
 		snake[0].y = headY;
 
-		if (!snakeCreate(field, snake[0], snake)) return false; // Создание головы змеи в новой позициию, проверка на максимальный размер
+		if (!snakeCreate(field, snake[0], snake)) return false; // РЎРѕР·РґР°РЅРёРµ РіРѕР»РѕРІС‹ Р·РјРµРё РІ РЅРѕРІРѕР№ РїРѕР·РёС†РёРёСЋ, РїСЂРѕРІРµСЂРєР° РЅР° РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ
 
-		snakeDirection = 'u'; // Смена направления головы
+		snakeDirection = 'u'; // РЎРјРµРЅР° РЅР°РїСЂР°РІР»РµРЅРёСЏ РіРѕР»РѕРІС‹
 		return true;
 	}
 	else return false;
 }
 
-// Движение вниз
+// Р”РІРёР¶РµРЅРёРµ РІРЅРёР·
 bool moveDown(char field[HEIGHT][WIDTH], Segment snake[]) {
 
-	// Проверка выхода за поле
+	// РџСЂРѕРІРµСЂРєР° РІС‹С…РѕРґР° Р·Р° РїРѕР»Рµ
 	if (snake[0].y < HEIGHT - 1) {
 
-		snakeDelete(field, snake[snakeSize]); // Удаление последнего сегмета
+		snakeDelete(field, snake[snakeSize]); // РЈРґР°Р»РµРЅРёРµ РїРѕСЃР»РµРґРЅРµРіРѕ СЃРµРіРјРµС‚Р°
 
-		if (field[snake[0].y + 1][snake[0].x] == snakeSymbol) return false; // Проверка на столкновение при движении вниз
+		if (field[snake[0].y + 1][snake[0].x] == snakeSymbol) return false; // РџСЂРѕРІРµСЂРєР° РЅР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёРµ РїСЂРё РґРІРёР¶РµРЅРёРё РІРЅРёР·
 
-		// Копирование новых координат головы
+		// РљРѕРїРёСЂРѕРІР°РЅРёРµ РЅРѕРІС‹С… РєРѕРѕСЂРґРёРЅР°С‚ РіРѕР»РѕРІС‹
 		int headX = snake[0].x;
 		int headY = snake[0].y + 1;
 
-		// Перетаскивание координат каждого сегмента на место предыдущего
+		// РџРµСЂРµС‚Р°СЃРєРёРІР°РЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚ РєР°Р¶РґРѕРіРѕ СЃРµРіРјРµРЅС‚Р° РЅР° РјРµСЃС‚Рѕ РїСЂРµРґС‹РґСѓС‰РµРіРѕ
 		for (int i = snakeSize; i > 0; i--) {
-			// Запоминание координат хвоста змеи
+			// Р—Р°РїРѕРјРёРЅР°РЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚ С…РІРѕСЃС‚Р° Р·РјРµРё
 			int tempLastY = snake[snakeSize].y;
 			int tempLastX = snake[snakeSize].x;
 
 			snake[i] = snake[i - 1];
 
-			// Cмена направления конца змеи
+			// CРјРµРЅР° РЅР°РїСЂР°РІР»РµРЅРёСЏ РєРѕРЅС†Р° Р·РјРµРё
 			if (i == snakeSize) {
 				setSnakeTailDirection(snake, tempLastY, tempLastX);
 			}
 		}
-		// Обновление позиции головы
+		// РћР±РЅРѕРІР»РµРЅРёРµ РїРѕР·РёС†РёРё РіРѕР»РѕРІС‹
 		snake[0].x = headX;
 		snake[0].y = headY;
 
-		if (!snakeCreate(field, snake[0], snake)) return false; // Создание головы змеи в новой позициию, проверка на максимальный размер
+		if (!snakeCreate(field, snake[0], snake)) return false; // РЎРѕР·РґР°РЅРёРµ РіРѕР»РѕРІС‹ Р·РјРµРё РІ РЅРѕРІРѕР№ РїРѕР·РёС†РёРёСЋ, РїСЂРѕРІРµСЂРєР° РЅР° РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ
 
-		snakeDirection = 'd'; // Смена направления головы
+		snakeDirection = 'd'; // РЎРјРµРЅР° РЅР°РїСЂР°РІР»РµРЅРёСЏ РіРѕР»РѕРІС‹
 		return true;
 	}
 	else return false;
 }
 
-// Движение влево
+// Р”РІРёР¶РµРЅРёРµ РІР»РµРІРѕ
 bool moveLeft(char field[HEIGHT][WIDTH], Segment snake[]) {
 
-	// Проверка выхода за поле
+	// РџСЂРѕРІРµСЂРєР° РІС‹С…РѕРґР° Р·Р° РїРѕР»Рµ
 	if (snake[0].x > 0) {
 		
-		snakeDelete(field, snake[snakeSize]); // Удаление последнего сегмета
+		snakeDelete(field, snake[snakeSize]); // РЈРґР°Р»РµРЅРёРµ РїРѕСЃР»РµРґРЅРµРіРѕ СЃРµРіРјРµС‚Р°
 
-		if (field[snake[0].y][snake[0].x - 1] == snakeSymbol) return false; // Проверка на столкновение при движении влево
+		if (field[snake[0].y][snake[0].x - 1] == snakeSymbol) return false; // РџСЂРѕРІРµСЂРєР° РЅР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёРµ РїСЂРё РґРІРёР¶РµРЅРёРё РІР»РµРІРѕ
 
-		// Копирование новых координат головы
+		// РљРѕРїРёСЂРѕРІР°РЅРёРµ РЅРѕРІС‹С… РєРѕРѕСЂРґРёРЅР°С‚ РіРѕР»РѕРІС‹
 
 		int headX = snake[0].x - 1;
 		int headY = snake[0].y;
 
-		// Перетаскивание координат каждого сегмента на место предыдущего
+		// РџРµСЂРµС‚Р°СЃРєРёРІР°РЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚ РєР°Р¶РґРѕРіРѕ СЃРµРіРјРµРЅС‚Р° РЅР° РјРµСЃС‚Рѕ РїСЂРµРґС‹РґСѓС‰РµРіРѕ
 		for (int i = snakeSize; i > 0; i--) {
-			// Запоминание координат хвоста змеи
+			// Р—Р°РїРѕРјРёРЅР°РЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚ С…РІРѕСЃС‚Р° Р·РјРµРё
 			int tempLastY = snake[snakeSize].y;
 			int tempLastX = snake[snakeSize].x;
 
 			snake[i] = snake[i - 1];
 
-			// Cмена направления конца змеи
+			// CРјРµРЅР° РЅР°РїСЂР°РІР»РµРЅРёСЏ РєРѕРЅС†Р° Р·РјРµРё
 			if (i == snakeSize) {
 				setSnakeTailDirection(snake, tempLastY, tempLastX);
 			}
 		}
-		// Обновление позиции головы
+		// РћР±РЅРѕРІР»РµРЅРёРµ РїРѕР·РёС†РёРё РіРѕР»РѕРІС‹
 		snake[0].x = headX;
 		snake[0].y = headY;
 
-		if (!snakeCreate(field, snake[0], snake)) return false; // Создание головы змеи в новой позициию, проверка на максимальный размер
+		if (!snakeCreate(field, snake[0], snake)) return false; // РЎРѕР·РґР°РЅРёРµ РіРѕР»РѕРІС‹ Р·РјРµРё РІ РЅРѕРІРѕР№ РїРѕР·РёС†РёРёСЋ, РїСЂРѕРІРµСЂРєР° РЅР° РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ
 
-		snakeDirection = 'l'; // Смена направления головы
+		snakeDirection = 'l'; // РЎРјРµРЅР° РЅР°РїСЂР°РІР»РµРЅРёСЏ РіРѕР»РѕРІС‹
 		return true;
 	}
 	else return false;
 }
 
-// Движение вправо
+// Р”РІРёР¶РµРЅРёРµ РІРїСЂР°РІРѕ
 bool moveRight(char field[HEIGHT][WIDTH], Segment snake[]) {
 
-	// Проверка выхода за поле
+	// РџСЂРѕРІРµСЂРєР° РІС‹С…РѕРґР° Р·Р° РїРѕР»Рµ
 	if (snake[0].x < WIDTH - 1) {
 
-		snakeDelete(field, snake[snakeSize]); // Удаление последнего сегмета
+		snakeDelete(field, snake[snakeSize]); // РЈРґР°Р»РµРЅРёРµ РїРѕСЃР»РµРґРЅРµРіРѕ СЃРµРіРјРµС‚Р°
 		
-		if (field[snake[0].y][snake[0].x + 1] == snakeSymbol) return false; // Проверка на столкновение при движении вправо
+		if (field[snake[0].y][snake[0].x + 1] == snakeSymbol) return false; // РџСЂРѕРІРµСЂРєР° РЅР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёРµ РїСЂРё РґРІРёР¶РµРЅРёРё РІРїСЂР°РІРѕ
 
-		// Копирование новых координат головы
+		// РљРѕРїРёСЂРѕРІР°РЅРёРµ РЅРѕРІС‹С… РєРѕРѕСЂРґРёРЅР°С‚ РіРѕР»РѕРІС‹
 		int headX = snake[0].x + 1;
 		int headY = snake[0].y;
 
-		// Перетаскивание координат каждого сегмента на место предыдущего
+		// РџРµСЂРµС‚Р°СЃРєРёРІР°РЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚ РєР°Р¶РґРѕРіРѕ СЃРµРіРјРµРЅС‚Р° РЅР° РјРµСЃС‚Рѕ РїСЂРµРґС‹РґСѓС‰РµРіРѕ
 		for (int i = snakeSize; i > 0; i--) {
-			// Запоминание координат хвоста змеи
+			// Р—Р°РїРѕРјРёРЅР°РЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚ С…РІРѕСЃС‚Р° Р·РјРµРё
 			int tempLastY = snake[snakeSize].y;
 			int tempLastX = snake[snakeSize].x;
 
 			snake[i] = snake[i - 1];
 
-			// Cмена направления конца змеи
+			// CРјРµРЅР° РЅР°РїСЂР°РІР»РµРЅРёСЏ РєРѕРЅС†Р° Р·РјРµРё
 			if (i == snakeSize) {
 				setSnakeTailDirection(snake, tempLastY, tempLastX);
 			}
 		}
-		// Обновление позиции головы
+		// РћР±РЅРѕРІР»РµРЅРёРµ РїРѕР·РёС†РёРё РіРѕР»РѕРІС‹
 		snake[0].x = headX;
 		snake[0].y = headY;
 
-		if (!snakeCreate(field, snake[0], snake)) return false; // Создание головы змеи в новой позициию, проверка на максимальный размер
+		if (!snakeCreate(field, snake[0], snake)) return false; // РЎРѕР·РґР°РЅРёРµ РіРѕР»РѕРІС‹ Р·РјРµРё РІ РЅРѕРІРѕР№ РїРѕР·РёС†РёРёСЋ, РїСЂРѕРІРµСЂРєР° РЅР° РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ
 
-		snakeDirection = 'r'; // Смена направления головы
+		snakeDirection = 'r'; // РЎРјРµРЅР° РЅР°РїСЂР°РІР»РµРЅРёСЏ РіРѕР»РѕРІС‹
 		return true;
 
 	}
@@ -350,28 +349,28 @@ bool moveRight(char field[HEIGHT][WIDTH], Segment snake[]) {
 }
 
 int main() {
-	srand(time(NULL)); // Отключение привязки генерации случайных чисел ко времени
+	srand(time(NULL)); // РћС‚РєР»СЋС‡РµРЅРёРµ РїСЂРёРІСЏР·РєРё РіРµРЅРµСЂР°С†РёРё СЃР»СѓС‡Р°Р№РЅС‹С… С‡РёСЃРµР» РєРѕ РІСЂРµРјРµРЅРё
 
 	char field0[HEIGHT][WIDTH];
 	bool playing = true; 
-	int gameSpeedMilliseconds = 400; // Скорость игры
+	int gameSpeedMilliseconds = 400; // РЎРєРѕСЂРѕСЃС‚СЊ РёРіСЂС‹
 
 	Segment snake[HEIGHT * WIDTH + 1];
 
 	fieldInitialize(field0); 
 	initializeSnake(field0, snake);
 
-	char userKey = 'w'; // Ввод пользователя по умолчанию
+	char userKey = 'w'; // Р’РІРѕРґ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
-	appleGeneration(field0, snake); // Первоначальная генерация яблока
-	fieldDisplay(field0, snake); // Отображение поля
+	appleGeneration(field0, snake); // РџРµСЂРІРѕРЅР°С‡Р°Р»СЊРЅР°СЏ РіРµРЅРµСЂР°С†РёСЏ СЏР±Р»РѕРєР°
+	fieldDisplay(field0, snake); // РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РїРѕР»СЏ
 	
-	// Игровой цикл
+	// РРіСЂРѕРІРѕР№ С†РёРєР»
 	do {
 
-		system("cls"); // Очистка экрана
+		system("cls"); // РћС‡РёСЃС‚РєР° СЌРєСЂР°РЅР°
 		
-		// Проверка зажатия клавиш движения
+		// РџСЂРѕРІРµСЂРєР° Р·Р°Р¶Р°С‚РёСЏ РєР»Р°РІРёС€ РґРІРёР¶РµРЅРёСЏ
 		if (GetAsyncKeyState('W') & 0x8000) {
 			if (snakeDirection != 'd') {
 				snakeDirection = 'u';
@@ -396,7 +395,7 @@ int main() {
 			appleGeneration(field0, snake);
 		}
 
-		// Движение взависимости от направлении змейки
+		// Р”РІРёР¶РµРЅРёРµ РІР·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РЅР°РїСЂР°РІР»РµРЅРёРё Р·РјРµР№РєРё
 		switch (snakeDirection) {
 		case 'u': if (!moveUp(field0, snake)) playing = false; break;
 		case 'd': if (!moveDown(field0, snake)) playing = false; break;
@@ -405,16 +404,17 @@ int main() {
 		}
 
 		if (playing) {
-			fieldDisplay(field0, snake); // Отображение поля
-			std::this_thread::sleep_for(std::chrono::milliseconds(gameSpeedMilliseconds)); // Скорость игры и считывания клавиш
+			fieldDisplay(field0, snake); // РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РїРѕР»СЏ
+			std::this_thread::sleep_for(std::chrono::milliseconds(gameSpeedMilliseconds)); // РЎРєРѕСЂРѕСЃС‚СЊ РёРіСЂС‹ Рё СЃС‡РёС‚С‹РІР°РЅРёСЏ РєР»Р°РІРёС€
 		}
 
 	} while (playing);
 
-	// Выводы конечных надписей
-	std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Небольшая задержки перед конечной заставкой
+	// Р’С‹РІРѕРґС‹ РєРѕРЅРµС‡РЅС‹С… РЅР°РґРїРёСЃРµР№
+	std::this_thread::sleep_for(std::chrono::milliseconds(100)); // РќРµР±РѕР»СЊС€Р°СЏ Р·Р°РґРµСЂР¶РєРё РїРµСЂРµРґ РєРѕРЅРµС‡РЅРѕР№ Р·Р°СЃС‚Р°РІРєРѕР№
 
 	if (snakeSize >= HEIGHT * WIDTH - 2) std::cout << "You won!\nScore: " << snakeSize + 1 << std::endl;
 	else std::cout << "Game is over!\nScore: " << snakeSize + 1 << std::endl;
+	system("pause");
 	return 0;
 }
